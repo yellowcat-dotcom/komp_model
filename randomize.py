@@ -1,7 +1,3 @@
-# Ваша задача:
-# 1)Сделать интерфейс.
-# 2)Поиграться с выводом(кто - то делает в textBox, кто - то в файл)
-
 import numpy as np
 import math
 import random
@@ -15,7 +11,6 @@ def sred_time_EVM(kol):
     return summ/iznach_kol
 
 def modelling(registration_time, error_probability, count_task, time_enter, error_time, processing_time):
-    all_time = time_enter
     count_task=count_task-1
     error_counter = 0
 
@@ -28,18 +23,12 @@ def modelling(registration_time, error_probability, count_task, time_enter, erro
     counter = 1
     queue_on_hold = 1
 
-    # интенсивность нагрузки(ро)  ф-ла
-    # !!!среденее время нахождения в очереди
-
-    #средние число каналов под обслуживанием ф-ла
-
     time_work_first_evm = 0
     time_work_second_evm = 0
     time_registration = registration_time
     time_error_complete = 0
 
     while counter <= count_task and queue_on_hold:
-        # print('Текущее задание', current_task)
         if (counter + registration_time // time_enter > count_task) and counter < count_task:
             differ = count_task - counter
             counter += differ
@@ -51,68 +40,32 @@ def modelling(registration_time, error_probability, count_task, time_enter, erro
         if queue_on_hold != 0:
             queue_on_hold -= 1
             if time_work_first_evm<time_work_second_evm:
-                workload_first_evm += 1#registration_time // time_enter
+                workload_first_evm += 1
             else:
-                workload_second_evm += 1#registration_time // time_enter
+                workload_second_evm += 1
             time_registration += registration_time
-
+#####
         if workload_first_evm != 0:
             count_first += 1
             time_work_first_evm += processing_time
-            # if queue_on_hold == 0:
-            # print('Выполнение задания на первой ЭВМ')
             if random.random() < error_probability:
-                #all_time += error_time
                 time_error_complete += error_time
                 error_counter += 1
-                # print('Ошибка!')
-                # print('Исправление ошибки')
-                # print('Повтор выполнения', current_task, 'задания')
                 time_work_first_evm += processing_time + error_time
-
                 workload_first_evm -= 1
             else:
                 workload_first_evm -= 1
 
         if workload_second_evm != 0:
-            # if check_error_first_evm:
-            #     check_error_first_evm = False
             count_second += 1
             time_work_second_evm += processing_time
-            # if queue_on_hold == 0:
-            #    all_time += processing_time
-            # print('Выполнение задания на второй ЭВМ')
             if random.random() < error_probability:
                 time_error_complete += error_time
-                # print('Ошибка!')
                 error_counter += 1
-                #all_time += error_time
-                # print('Повтор выполнения', current_task, 'задания')
                 time_work_second_evm += processing_time+error_time
                 workload_second_evm -= 1
             else:
-                #current_task += 1
                 workload_second_evm -= 1
-        # print()
-
-    lyambda = 60 / time_enter
-    nu = 1 / processing_time * 60
-    A = lyambda
-    p = lyambda / nu
-    p0 = (1 + p + p * p / (4 * (2 - p))) ** (-1)
-
-    p1 = p * p0
-    p2 = p * p * p0 / 4
-
-    Q = 1
-
-    L = p0 * p ** 3 / (2 * 4 * (1 - p / 2) ** 2)
-
-    Kzak = A / nu
-    Lsist = L + p
-    T = L / lyambda
-    Tsist = Lsist / lyambda
-
 
 
     print('\nДлина очереди: ',registration_time//time_enter)
@@ -145,18 +98,20 @@ def modelling(registration_time, error_probability, count_task, time_enter, erro
     print('ИНТЕНСИВНОСТЬ НАГРУЗКИ(ро) ф-ла:',
           round(((error_probability * a + b * processing_time) / registration_time), 2))
 
-    print('ПРОПУСКНАЯ СПОСОБНОСТЬ', round((count_task / all_time) / 60, 2), " задач/мин")
+    print('ПРОПУСКНАЯ СПОСОБНОСТЬ', round((count_task / all_time), 2), " задач/ч")
 
     # Cреденее время нахождения в очереди
     lamda = 1 / time_enter
     mu = 1 / processing_time
     v_ocheredi = lamda / (mu * abs(mu - lamda))
-    print('Cреденее время нахождения в очереди:', round(v_ocheredi, 2), ' мин')
+    print('Cреденее время нахождения в очереди:', round(v_ocheredi/60, 2), ' ч')
 
     igig = time_registration + random.choice([10, 23])
     print('Время обработки всех 100 заданий:', round(igig / 60, 2), ' ч')
 
     print('средние число каналов под обслуживанием ф-ла', round((1 + 2 + 2) / 3, 2), 'каналов')
+
+    print('Общее количество деталей в очереди',all_time*60/2)
 
 
 def main():
